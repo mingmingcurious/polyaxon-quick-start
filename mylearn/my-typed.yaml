@@ -26,7 +26,8 @@ run:
   # - git: {url: "https://github.com/polyaxon/polyaxon-quick-start"}
   #s3方式加载训练代码
   - connection: dbybucket-mlops
-    path: "{{ globals.artifacts_path }}/algo/polyaxon-quick-start/"
+    #s3文件下载的根目录
+    path: "{{ globals.artifacts_path }}/code"
     artifacts:
       dirs: ["algo/polyaxon-quick-start/"]
   container:
@@ -35,7 +36,7 @@ run:
     imagePullPolicy: IfNotPresent
     #自定义镜像，运行具体引擎的代码
     #指定代码目录
-    workingDir: "{{ globals.artifacts_path }}/algo/polyaxon-quick-start/"
+    workingDir: "{{ globals.artifacts_path }}/code/algo/polyaxon-quick-start/"
     #使用python运行默认的训练脚本
     command: [python3, model.py]
     args: [
