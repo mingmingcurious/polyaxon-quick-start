@@ -15,7 +15,7 @@ run:
       "--allow-root",
       "--NotebookApp.allow_origin=*",
       "--NotebookApp.trust_xheaders=True",
-      "--NotebookApp.token=",
+      "--NotebookApp.token=qwer1234",
       "--NotebookApp.base_url={{globals.base_url}}",
       "--LabApp.base_url={{globals.base_url}}"
     ]
