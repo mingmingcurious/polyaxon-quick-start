@@ -17,5 +17,6 @@ run:
       "--NotebookApp.trust_xheaders=True",
       "--NotebookApp.token=qwer1234",
       "--NotebookApp.base_url={{globals.base_url}}",
-      "--LabApp.base_url={{globals.base_url}}"
+      "--LabApp.base_url={{globals.base_url}}",
+      "--NotebookApp.notebook_dir={{globals.run_outputs_path}}"
     ]
