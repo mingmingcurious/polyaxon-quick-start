@@ -6,6 +6,7 @@ run:
   ports: [8888]
   container:
     image: jupyter/tensorflow-notebook
+    imagePullPolicy: IfNotPresent
     command: ["jupyter", "lab"]
     args: [
       "--no-browser",
