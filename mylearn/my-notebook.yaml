@@ -5,7 +5,7 @@ run:
   kind: service
   ports: [8888]
   container:
-    image: jupyter/tensorflow-notebook
+    image: jupyter/tensorflow-notebook:v3.4.3-zh-CN
     imagePullPolicy: IfNotPresent
     command: ["jupyter", "lab"]
     args: [
