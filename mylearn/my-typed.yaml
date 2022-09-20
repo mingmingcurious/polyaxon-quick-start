@@ -25,7 +25,7 @@ run:
   #git方式加载训练代码
   # - git: {url: "https://github.com/polyaxon/polyaxon-quick-start"}
   #s3方式加载训练代码
-  - connection: dbybucket-mlops
+  - connection: s3-dbybucket-mlops
     #s3文件下载的根目录
     path: "{{ globals.artifacts_path }}/code"
     artifacts:
