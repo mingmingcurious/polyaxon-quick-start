@@ -3,7 +3,7 @@ kind: operation
 name: build
 params:
   destination:
-    connection: registry-dbydocker-repo
+    # connection: registry-dbydocker-repo
     value: polyaxon/polyaxon-quick-start:xw
 runPatch:
   init:
@@ -12,4 +12,4 @@ runPatch:
       run:
       - 'pip3 install --no-cache-dir -U polyaxon'
       langEnv: 'en_US.UTF-8'
-# hubRef: kaniko
+hubRef: kaniko
