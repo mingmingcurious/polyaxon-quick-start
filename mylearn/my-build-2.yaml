@@ -1,0 +1,28 @@
+version: 1.1
+kind: component
+name: build-experiment
+tags: [build]
+
+
+
+#节点调度
+environment:
+  hostAliases:
+  - ip: "172.16.1.33"
+    hostnames:
+    - "image.io"
+
+run:
+  kind: operation
+  params:
+    destination:
+      connection: registry-dbydocker-repo
+      value: polyaxon/polyaxon-quick-start:xw
+  runPatch:
+    init:
+    - dockerfile:
+        image: "tensorflow/tensorflow:2.4.2"
+        run:
+        - 'pip3 install --no-cache-dir -U polyaxon'
+        langEnv: 'en_US.UTF-8'
+  hubRef: kaniko
