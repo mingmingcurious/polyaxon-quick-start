@@ -3,7 +3,7 @@ kind: operation
 name: build
 params:
   destination:
-    connection: registry-polyaxon
+    # connection: registry-polyaxon
     value: polyaxon/polyaxon-quick-start:xw
 runPatch:
   init:
