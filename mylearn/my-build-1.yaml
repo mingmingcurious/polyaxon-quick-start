@@ -13,7 +13,7 @@ runPatch:
       - "image.io"
   init:
   - dockerfile:
-      image: "image.io/base/tensorflow:2.4.2"
+      image: "tensorflow/tensorflow:2.4.2"
       run:
       - 'pip3 install --no-cache-dir -U polyaxon'
       langEnv: 'en_US.UTF-8'
