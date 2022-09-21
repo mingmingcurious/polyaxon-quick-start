@@ -6,6 +6,11 @@ params:
     connection: registry-dbydocker-repo
     value: polyaxon/polyaxon-quick-start:xw
 runPatch:
+  environment:
+    hostAliases:
+    - ip: "172.16.1.33"
+      hostnames:
+      - "image.io"
   init:
   - dockerfile:
       image: "tensorflow/tensorflow:2.4.2"
