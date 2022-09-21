@@ -18,3 +18,53 @@ runPatch:
       - 'pip3 install --no-cache-dir -U polyaxon'
       langEnv: 'en_US.UTF-8'
 hubRef: kaniko
+component:
+  version: 1.1
+  kind: component
+  name: kaniko
+  tags:
+    - build
+  inputs:
+    - name: context
+      description: >-
+        A directory containing a Dockerfile which kaniko will use to build your
+        image, default is artifacts path.
+      type: str
+      isOptional: true
+    - name: cache
+      description: Enable cache layers created by RUN commands in a remote repository.
+      type: bool
+      value: true
+      isOptional: true
+      isFlag: true
+    - name: cache_ttl
+      type: str
+      value: 6h
+      isOptional: true
+    - name: dockerfile
+      type: str
+      isOptional: true
+  outputs:
+    - name: destination
+      type: image
+  run:
+    kind: job
+    connections:
+      - '{{ params.destination.connection }}'
+    container:
+      args:
+        - '-c'
+        - '{{ context or globals.artifacts_path }}'
+        - '-d'
+        - >-
+          {{ (connections[params.destination.connection].url + '/' + destination)
+          if (params.destination.connection in connections and
+          connections[params.destination.connection].url) else destination }}
+        - '{{ cache }}'
+        - '--cache-ttl={{ cache_ttl }}'
+        - '{{ params.dockerfile.as_arg }}'
+        - '--skip-tls-verify=true'
+        - '--insecure=true'
+      image: gcr.io/kaniko-project/executor:latest
+      imagePullPolicy: IfNotPresent
+      name: polyaxon-main
