@@ -14,6 +14,11 @@ runPatch:
       hostnames:
       - "image.io"
   init:
+    #s3方式加载训练代码
+  - path: "{{ globals.artifacts_path }}/code"  #s3文件下载的根目录
+    connection: s3-dbybucket-mlops             #使用的连接
+    artifacts:
+      dirs: ["algo/polyaxon-quick-start/"]     #需要下载的目录集合
   #构建镜像的配置
   - dockerfile:
       #基础镜像 FROM
@@ -57,14 +62,6 @@ component:
       type: image
   run:
     kind: job
-    init:
-    #git方式加载训练代码
-    # - git: {url: "https://github.com/polyaxon/polyaxon-quick-start"}
-    #s3方式加载训练代码
-    - path: "{{ globals.artifacts_path }}/code"  #s3文件下载的根目录
-      connection: s3-dbybucket-mlops             #使用的连接
-      artifacts:
-        dirs: ["algo/polyaxon-quick-start/"]     #需要下载的目录集合
     connections:
       - '{{ params.destination.connection }}'
     container:
