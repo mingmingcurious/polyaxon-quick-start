@@ -23,34 +23,4 @@ runPatch:
       - 'pip3 install --no-cache-dir -U polyaxon'
       #ENV命令
       langEnv: 'en_US.UTF-8'
-hubRef: kaniko
-#下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
-#并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
-component:
-  version: 1.1
-  kind: component
-  name: kaniko
-  tags:
-    - build-2
-  run:
-    kind: job
-    connections:
-      - '{{ params.destination.connection }}'
-    container:
-      args:
-        - '-c'
-        - '{{ context or globals.artifacts_path }}'
-        - '-d'
-        - >-
-          {{ (connections[params.destination.connection].url + '/' + destination)
-          if (params.destination.connection in connections and
-          connections[params.destination.connection].url) else destination }}
-        - '{{ cache }}'
-        - '--cache-ttl={{ cache_ttl }}'
-        - '{{ params.dockerfile.as_arg }}'
-        #配置下面两个参数，让kaniko不使用https
-        - '--skip-tls-verify=true'
-        - '--insecure=true'
-      image: gcr.io/kaniko-project/executor:latest
-      imagePullPolicy: IfNotPresent
-      name: polyaxon-main
+hubRef: my-kaniko
