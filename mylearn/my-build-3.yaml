@@ -1,42 +1,87 @@
 version: 1.1
-kind: experiment
-
-inputs:
-  - name: batch_size
-    description: batch size
-    is_optional: true # 是否可选
-    default: 128
-    type: int
-  - name: num_steps
-    is_optional: true
-    default: 500
-    type: int
-  - name: learning_rate
-    is_optional: true
-    default: 0.001
-    type: float
-  - name: dropout
-    is_optional: true
-    default: 0.25
-    type: float
-  - name: num_epochs
-    is_optional: true
-    default: 1
-    type: int
-  - name: activation
-    is_optional: true
-    default: relu
-    type: str
-
-build:
-  image: tensorflow/tensorflow:2.4.2
-  build_steps:
-    - pip3 install --no-cache-dir -U polyaxon-client==0.5.0
-
-run:
-  cmd:  python3 model.py --batch_size={{ batch_size }} \
-                         --num_steps={{ num_steps }} \
-                         --learning_rate={{ learning_rate }} \
-                         --dropout={{ dropout }} \
-                         --num_epochs={{ num_epochs }} \
-                         --activation={{ activation }}
+kind: operation
+name: build
+params:
+  destination:
+    #docker仓库连接，镜像构建完成后推送到这个仓库
+    connection: registry-polyaxon
+    value: polyaxon/polyaxon-quick-start:xw
+runPatch:
+  #指定域名解析
+  environment:
+    hostAliases:
+    - ip: "172.16.1.33"
+      hostnames:
+      - "image.io"
+  init:
+  #构建镜像的配置
+  - dockerfile:
+      #基础镜像 FROM
+      image: "tensorflow/tensorflow:2.4.2"
+      #RUN命令
+      run:
+      - 'pip3 install --no-cache-dir -U polyaxon'
+      #ENV命令
+      langEnv: 'en_US.UTF-8'
+hubRef: my-kaniko
+#下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
+#并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
+component:
+  version: 1.1
+  kind: component
+  name: kaniko
+  tags:
+    - build-1
+  inputs:
+    - name: context
+      description: >-
+        A directory containing a Dockerfile which kaniko will use to build your
+        image, default is artifacts path.
+      type: str
+      isOptional: true
+    - name: cache
+      description: Enable cache layers created by RUN commands in a remote repository.
+      type: bool
+      value: true
+      isOptional: true
+      isFlag: true
+    - name: cache_ttl
+      type: str
+      value: 6h
+      isOptional: true
+    - name: dockerfile
+      type: str
+      isOptional: true
+  outputs:
+    - name: destination
+      type: image
+  run:
+    kind: job
+    init:
+    #git方式加载训练代码
+    # - git: {url: "https://github.com/polyaxon/polyaxon-quick-start"}
+    #s3方式加载训练代码
+    - path: "{{ globals.artifacts_path }}/code"  #s3文件下载的根目录
+      connection: s3-dbybucket-mlops             #使用的连接
+      artifacts:
+        dirs: ["algo/polyaxon-quick-start/"]     #需要下载的目录集合
+    connections:
+      - '{{ params.destination.connection }}'
+    container:
+      args:
+        - '-c'
+        - '{{ context or globals.artifacts_path }}'
+        - '-d'
+        - >-
+          {{ (connections[params.destination.connection].url + '/' + destination)
+          if (params.destination.connection in connections and
+          connections[params.destination.connection].url) else destination }}
+        - '{{ cache }}'
+        - '--cache-ttl={{ cache_ttl }}'
+        - '{{ params.dockerfile.as_arg }}'
+        #配置下面两个参数，让kaniko不使用https
+        - '--skip-tls-verify=true'
+        - '--insecure=true'
+      image: gcr.io/kaniko-project/executor:latest
+      imagePullPolicy: IfNotPresent
+      name: polyaxon-main
