@@ -3,7 +3,7 @@ kind: operation
 name: build
 params:
   destination:
-    # connection: registry-dbydocker-repo
+    connection: registry-dbydocker-repo
     value: polyaxon/polyaxon-quick-start:xw
 runPatch:
   init:
