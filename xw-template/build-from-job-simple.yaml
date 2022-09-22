@@ -26,12 +26,12 @@ runPatch:
       hostnames:
       - "image.io"
   init:
-  - connection: "{{ params.plx-sys-s3-name.value }}" 
+  - connection: s3-dbybucket-mlops-plx 
     artifacts:
       #训练输出
       dirs: 
-      - ["{{ params.job-uuid.value }}/outputs/", "{{ globals.artifacts_path }}/outputs/"]
-  - connection: "{{ params.plx-data-s3-name.value }}" 
+      - ["{{ params.job-uuid }}/outputs/", "{{ globals.artifacts_path }}/outputs/"]
+  - connection: s3-dbybucket-mlops 
     artifacts:
       #构建镜像的Dockerfile
       files:
