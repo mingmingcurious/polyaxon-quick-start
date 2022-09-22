@@ -1,0 +1,54 @@
+version: 1.1
+kind: component
+name: train
+description: Specify the algorithm to train
+tags: ["job","train"]
+
+#查询算法定义的参数，全部罗列出来
+inputs:
+- {name: code_dir, type: str, value: algo/polyaxon-quick-start/, isOptional: true}
+- {name: boot_file, type: str, value: model.py, isOptional: true}
+- {name: engine_image, type: str, value: polyaxon/polyaxon-quick-start:latest, isOptional: true}
+- {name: conv1_size, type: int, value: 32, isOptional: true}
+- {name: conv2_size, type: int, value: 64, isOptional: true}
+- {name: dropout, type: float, value: 0.2, isOptional: true}
+- {name: hidden1_size, type: int, value: 500, isOptional: true}
+- {name: conv_activation, type: str, value: relu, isOptional: true}
+- {name: dense_activation, type: str, value: relu, isOptional: true}
+- {name: optimizer, type: str, value: adam, isOptional: true}
+- {name: learning_rate, type: float, value: 0.001, isOptional: true}
+- {name: epochs, type: int, value: 3, isOptional: true}
+outputs:
+- {name: loss, type: float}
+- {name: accuracy, type: float}
+
+run:
+  kind: job
+  init:
+  #git方式加载训练代码
+  # - git: {url: "https://github.com/polyaxon/polyaxon-quick-start"}
+  #s3方式加载训练代码
+  - connection: s3-dbybucket-mlops
+    #s3文件下载的根目录
+    artifacts:
+      dirs: [["{{code_dir}}",""{{ globals.artifacts_path }}/code""]]
+  container:
+    #官网镜像，运行代码
+    image: {{engine_image}}
+    imagePullPolicy: IfNotPresent
+    #自定义镜像，运行具体引擎的代码
+    #指定代码目录
+    workingDir: "{{ globals.artifacts_path }}/code/"
+    #使用python运行默认的训练脚本
+    command: [python3, {{boot_file}}]
+    args: [
+      "--conv1_size={{ conv1_size }}",
+      "--conv2_size={{ conv2_size }}",
+      "--dropout={{ dropout }}",
+      "--hidden1_size={{ hidden1_size }}",
+      "--optimizer={{ optimizer }}",
+      "--conv_activation={{ conv_activation }}",
+      "--dense_activation={{ dense_activation }}",
+      "--learning_rate={{ learning_rate }}",
+      "--epochs={{ epochs }}"
+    ]
