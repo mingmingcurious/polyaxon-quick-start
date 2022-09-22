@@ -52,7 +52,7 @@ component:
           hostnames:
           - "image.io"
     connections:
-      - '{{ params.destination.connection }}'
+      - '{{ destination.connection }}'
     init:
         #s3方式加载训练代码
       - connection: s3-dbybucket-mlops            
