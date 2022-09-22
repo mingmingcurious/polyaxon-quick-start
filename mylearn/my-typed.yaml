@@ -19,7 +19,7 @@ outputs:
 - {name: loss, type: float}
 - {name: accuracy, type: float}
 
-run:
+runPatch:
   kind: job
   init:
   #git方式加载训练代码
