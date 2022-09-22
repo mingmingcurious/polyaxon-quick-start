@@ -19,13 +19,13 @@ outputs:
 - {name: loss, type: float}
 - {name: accuracy, type: float}
 
-runPatch:
+run:
   kind: job
   environment:
-  hostAliases:
-    - hostnames:
-        - image.io
-      ip: 172.16.1.33
+    hostAliases:
+      - hostnames:
+          - image.io
+        ip: 172.16.1.33
   connections:
     - registry-polyaxon
   container:
