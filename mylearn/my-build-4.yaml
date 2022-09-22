@@ -6,6 +6,8 @@ params:
     #docker仓库连接，镜像构建完成后推送到这个仓库
     connection: registry-polyaxon
     value: polyaxon/polyaxon-quick-start:{{ globals.uuid }}
+  context:
+    value: "{{ globals.run_artifacts_path }}/algo/polyaxon-quick-start"
 runPatch:
   #指定域名解析
   environment:
@@ -15,19 +17,19 @@ runPatch:
       - "image.io"
   init:
     #s3方式加载训练代码
-  - path: "{{ globals.artifacts_path }}"  #s3文件下载的根目录
+  - path: "{{ globals.run_artifacts_path }}"  #s3文件下载的根目录
     connection: s3-dbybucket-mlops             #使用的连接
     artifacts:
-      files: ["algo/polyaxon-quick-start/*"]     #需要下载的目录集合
-  #构建镜像的配置
-  - dockerfile:
-      #基础镜像 FROM
-      image: "tensorflow/tensorflow:2.4.2"
-      #RUN命令
-      run:
-      - 'pip3 install --no-cache-dir -U polyaxon'
-      #ENV命令
-      langEnv: 'en_US.UTF-8'
+      files: ["algo/polyaxon-quick-start/"]     #需要下载的目录集合
+  # #构建镜像的配置
+  # - dockerfile:
+  #     #基础镜像 FROM
+  #     image: "tensorflow/tensorflow:2.4.2"
+  #     #RUN命令
+  #     run:
+  #     - 'pip3 install --no-cache-dir -U polyaxon'
+  #     #ENV命令
+  #     langEnv: 'en_US.UTF-8'
 hubRef: my-kaniko
 #下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
 #并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
@@ -67,7 +69,7 @@ component:
     container:
       args:
         - '-c'
-        - '{{ globals.artifacts_path }}'
+        - '{{ context }}'
         - '-d'
         - >-
           {{ (connections[params.destination.connection].url + '/' + destination)
