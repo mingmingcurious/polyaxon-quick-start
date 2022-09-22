@@ -44,6 +44,7 @@ component:
     #配置下面两个参数，让kaniko不使用https
     - {name: insecure, type: bool, value: true, isOptional: true}
     - {name: skip-tls-verify, type: bool, value: true, isOptional: true}
+    - {name: s3-con-name, type: str}
   outputs:
     - {name: destination, type: image, value: "{{ params.destination.value }}", isOptional: true, connection: "{{ params.destination.connection }}"}
   run:
@@ -57,7 +58,7 @@ component:
       - '{{ params.destination.connection }}'
     init:
         #s3方式加载训练代码
-      - connection: "{{ params.s3-con-name.value }}"         
+      - connection: "{{ s3-con-name }}"         
         artifacts:
           #模型和推理代码
           dirs: 
