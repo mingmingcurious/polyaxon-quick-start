@@ -46,6 +46,7 @@ run:
       "-d",
       "{{ (connections[params.destination.connection].url + '/'+ image_project  +'/'+ image_name + ':' + image_tag) }}",
       "--cache",
+      "--cache-ttl=6h",
       "--skip-tls-verify=true",
       "--insecure=true"
     ]
