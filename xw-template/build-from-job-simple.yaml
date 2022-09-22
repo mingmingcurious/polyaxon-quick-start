@@ -39,6 +39,7 @@ component:
       type: str
     - name: job_uuid
       type: str
+      isOptional: true
   outputs:
     - name: destination
       type: image
