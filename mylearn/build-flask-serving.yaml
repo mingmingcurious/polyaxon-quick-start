@@ -8,13 +8,6 @@ params:
     value: polyaxon/flask-serving:1.0.0
   context:
     value: "{{ globals.artifacts_path }}"
-  #传给kaniko的参数
-  # skip-tls-verify:
-  #   value: true
-  # insecure:
-  #   value: true
-  dockerfile:
-    value: "{{ globals.artifacts_path }}/Dockerfile"
 runPatch:
   #指定域名解析
   environment:
@@ -35,52 +28,52 @@ runPatch:
 hubRef: kaniko
 #下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
 #并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
-# component:
-#   version: 1.1
-#   kind: component
-#   name: kaniko
-#   tags:
-#     - build-1
-#   inputs:
-#     - name: context
-#       description: Dockerfile目录
-#       type: str
-#       isOptional: true
-#     - name: cache
-#       description: 缓存开关
-#       type: bool
-#       value: true
-#       isOptional: true
-#       isFlag: true
-#     - name: cache_ttl
-#       type: str
-#       value: 6h
-#       isOptional: true
-#     - name: dockerfile
-#       type: str
-#       isOptional: true
-#   outputs:
-#     - name: destination
-#       type: image
-#   run:
-#     kind: job
-#     connections:
-#       - '{{ params.destination.connection }}'
-#     container:
-#       args:
-#         - '-c'
-#         - '{{ context }}'
-#         - '-d'
-#         - >-
-#           {{ (connections[params.destination.connection].url + '/' + destination)
-#           if (params.destination.connection in connections and
-#           connections[params.destination.connection].url) else destination }}
-#         - '{{ cache }}'
-#         - '--cache-ttl={{ cache_ttl }}'
-#         - '{{ params.dockerfile.as_arg }}'
-#         #配置下面两个参数，让kaniko不使用https
-#         - '--skip-tls-verify=true'
-#         - '--insecure=true'
-#       image: gcr.io/kaniko-project/executor:latest
-#       imagePullPolicy: IfNotPresent
-#       name: polyaxon-main
+component:
+  version: 1.1
+  kind: component
+  name: kaniko
+  tags:
+    - build-1
+  inputs:
+    - name: context
+      description: Dockerfile目录
+      type: str
+      isOptional: true
+    - name: cache
+      description: 缓存开关
+      type: bool
+      value: true
+      isOptional: true
+      isFlag: true
+    - name: cache_ttl
+      type: str
+      value: 6h
+      isOptional: true
+    - name: dockerfile
+      type: str
+      isOptional: true
+  outputs:
+    - name: destination
+      type: image
+  run:
+    kind: job
+    connections:
+      - '{{ params.destination.connection }}'
+    container:
+      args:
+        - '-c'
+        - '{{ context }}'
+        - '-d'
+        - >-
+          {{ (connections[params.destination.connection].url + '/' + destination)
+          if (params.destination.connection in connections and
+          connections[params.destination.connection].url) else destination }}
+        - '{{ cache }}'
+        - '--cache-ttl={{ cache_ttl }}'
+        - '{{ params.dockerfile.as_arg }}'
+        #配置下面两个参数，让kaniko不使用https
+        - '--skip-tls-verify=true'
+        - '--insecure=true'
+      image: gcr.io/kaniko-project/executor:latest
+      imagePullPolicy: IfNotPresent
+      name: polyaxon-main
