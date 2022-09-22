@@ -1,0 +1,66 @@
+version: 1.1
+kind: component
+name: build
+tags:
+  - build-from-job
+
+inputs:
+  - name: context
+    type: str
+    value: "{{ globals.artifacts_path }}"
+    isOptional: true
+  - name: job-uuid
+    type: str
+    value: 70a129430d3c4a91b41dbe902ec02b3d
+    isOptional: true
+  - name: image-name
+    type: str
+    value: flask-serving
+    isOptional: true
+  - name: image-tag
+    type: str
+    value: "1.0.0"
+    isOptional: true  
+  - name: plx-sys-s3-name
+    type: str
+    value: s3-dbybucket-mlops-plx 
+    isOptional: true
+  - name: plx-data-s3-name
+    type: str
+    value: s3-dbybucket-mlops
+    isOptional: true
+outputs:
+  - name: destination
+    type: image
+    connection: registry-polyaxon
+    value: polyaxon/flask-serving:1.0.0
+
+
+run:
+  kind: job
+  connections:
+    - '{{ params.destination.connection }}'
+  init:
+  - connection: s3-dbybucket-mlops-plx 
+    artifacts:
+      #训练输出
+      dirs: 
+      - ["70a129430d3c4a91b41dbe902ec02b3d/outputs/", "{{ globals.artifacts_path }}/outputs/"]
+  - connection: s3-dbybucket-mlops 
+    artifacts:
+      #构建镜像的Dockerfile
+      files:
+      - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
+  container:
+    image: gcr.io/kaniko-project/executor:latest
+    imagePullPolicy: IfNotPresent
+    name: polyaxon-main
+    args: 
+      - '-c'
+      - '{{ context }}'
+      - '-d'
+      - "{{ (connections[params.destination.connection].url + '/' + image-name + ':' + image-tag) }}"
+      - '--cache'
+      - '--cache-ttl=6h'
+      - '--skip-tls-verify=true'
+      - '--insecure=true'
