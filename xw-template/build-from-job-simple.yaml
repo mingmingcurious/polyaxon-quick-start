@@ -77,7 +77,7 @@ component:
       artifacts:
         #训练输出
         dirs: 
-        - ["{{ job-uuid }}/outputs/, "{{ globals.artifacts_path }}/outputs/"]
+        - ["{{ job-uuid }}/outputs/", "{{ globals.artifacts_path }}/outputs/"]
     - connection: "{{ plx-data-s3-name }}" 
       artifacts:
         #构建镜像的Dockerfile
