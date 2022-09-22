@@ -1,0 +1,20 @@
+version: 1.1
+kind: component
+name: iris-classification
+tags: ["streamlit", "app"]
+
+run:
+  kind: service
+  #指定域名解析
+  environment:
+    hostAliases:
+    - ip: "172.16.1.33"
+      hostnames:
+      - "image.io"
+  ports: [8501]
+  rewritePath: true
+  container:
+    image: image.io/polyaxon/streamlit-app:eaa71a521e834fe0adc1b54eee222ebf
+    workingDir: "/app"
+    command: [streamlit, run, app.py]
+    args: ["--", "--model-path=./model.joblib"]
