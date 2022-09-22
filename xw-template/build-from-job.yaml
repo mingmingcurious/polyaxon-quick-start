@@ -6,7 +6,7 @@ tags: [build-from-job]
 inputs:
   - name: context
     type: str
-    value: /plx_context/artifacts
+    value: /plx-context/artifacts
     isOptional: true
   - name: job-uuid
     type: str
@@ -41,6 +41,11 @@ run:
     - s3-dbybucket-mlops-plx
     - s3-dbybucket-mlops
     - registry-polyaxon
+  environment:
+    hostAliases:
+    - ip: "172.16.1.33"
+      hostnames:
+      - "image.io"
   init:
   - connection: s3-dbybucket-mlops-plx 
     artifacts:
@@ -57,9 +62,9 @@ run:
     imagePullPolicy: IfNotPresent
     args: 
       - '-c'
-      - /plx-context/artifacts
+      - '{{context}}'
       - '-d'
-      - image.io/polyaxon/flask-serving:1.0.0
+      - 'image.io/polyaxon/{{image-name}}:{{image-tag}}'
       - '--cache'
       - '--cache-ttl=6h'
       - '--skip-tls-verify=true'
