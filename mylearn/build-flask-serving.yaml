@@ -10,7 +10,7 @@ params:
     value: "{{ globals.artifacts_path }}"
   #传给kaniko的参数
   dockerfile:
-    value: ["--skip-tls-verify=true","--insecure=true"]
+    value: {"--skip-tls-verify":"true","--insecure":"true"}
 runPatch:
   #指定域名解析
   environment:
