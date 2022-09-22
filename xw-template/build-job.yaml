@@ -43,7 +43,7 @@ component:
     - {name: insecure, type: bool, value: true, isOptional: true}
     - {name: skip-tls-verify, type: bool, value: true, isOptional: true}
   outputs:
-    - {name: destination, type: image, value: polyaxon/flask-serving:1.0.0, connection: registry-polyaxon}
+    - {name: destination, type: image, value: polyaxon/flask-serving:1.0.0, isOptional: true, connection: registry-polyaxon}
   run:
     kind: job
     environment:
