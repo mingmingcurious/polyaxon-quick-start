@@ -26,12 +26,11 @@ run:
       - hostnames:
           - image.io
         ip: 172.16.1.33
-  connections:
-    - registry-polyaxon
   container:
     #官网镜像，运行代码
-    image: polyaxon/polyaxon-quick-start:baab0b1146ac4ddf84db9ca5e0405de1
+    image: image.io/polyaxon/polyaxon-quick-start:baab0b1146ac4ddf84db9ca5e0405de1
     imagePullPolicy: IfNotPresent
+    connection: registry-polyaxon
     #自定义镜像，运行具体引擎的代码
     #指定代码目录
     workingDir: "/code"
