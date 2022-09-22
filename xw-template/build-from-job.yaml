@@ -8,23 +8,23 @@ inputs:
     type: str
     value: /plx-context/artifacts
     isOptional: true
-  - name: job-uuid
+  - name: job_uuid
     type: str
     value: 70a129430d3c4a91b41dbe902ec02b3d
     isOptional: true
-  - name: image-name
+  - name: image_name
     type: str
     value: flask-serving
     isOptional: true
-  - name: image-tag
+  - name: image_tag
     type: str
     value: "1.0.0"
     isOptional: true  
-  - name: plx-sys-s3-name
+  - name: plx_sys_s3_name
     type: str
     value: s3-dbybucket-mlops-plx 
     isOptional: true
-  - name: plx-data-s3-name
+  - name: plx_data_s3_name
     type: str
     value: s3-dbybucket-mlops
     isOptional: true
@@ -64,7 +64,7 @@ run:
       "-c",
       "{{ context }}",
       "-d",
-      "image.io/polyaxon/{{ image-name }}:{{ image-tag }}",
+      "image.io/polyaxon/{{ image_name }}:{{ image_tag }}",
       "--cache",
       "--skip-tls-verify=true",
       "--insecure=true"
