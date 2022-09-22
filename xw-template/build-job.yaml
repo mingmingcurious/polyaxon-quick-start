@@ -1,15 +1,15 @@
 version: 1.1
 kind: operation
 name: build
-params:
-  destination:
-    #docker仓库连接，镜像构建完成后推送到这个仓库
-    connection: registry-polyaxon
-    value: polyaxon/flask-serving:1.0.0
-  context:
-    value: "{{ globals.artifacts_path }}"
-  s3-con-name:
-    value: s3-dbybucket-mlops
+# params:
+#   destination:
+#     #docker仓库连接，镜像构建完成后推送到这个仓库
+#     connection: registry-polyaxon
+#     value: polyaxon/flask-serving:1.0.0
+#   context:
+#     value: "{{ globals.artifacts_path }}"
+#   s3-con-name:
+#     value: s3-dbybucket-mlops
 # runPatch:
   #指定域名解析
   # environment:
@@ -37,7 +37,7 @@ component:
   tags:
     - build-1
   inputs:
-    - {name: context, type: str, value: "{{ params.context.value }}", isOptional: true}
+    - {name: context, type: str, value: "{{ globals.artifacts_path }}", isOptional: true}
     - {name: dockerfile, type: str, isOptional: true}
     - {name: cache, type: bool, value: true, isOptional: true, isFlag: true}
     - {name: cache_ttl, type: str, value: 6h, isOptional: true}
@@ -46,7 +46,7 @@ component:
     - {name: skip-tls-verify, type: bool, value: true, isOptional: true}
     - {name: s3-con-name, type: str}
   outputs:
-    - {name: destination, type: image, value: "{{ params.destination.value }}", isOptional: true, connection: "{{ params.destination.connection }}"}
+    - {name: destination, type: image, value: polyaxon/flask-serving:1.0.0, isOptional: true, connection: registry-polyaxon}
   run:
     kind: job
     environment:
@@ -55,10 +55,10 @@ component:
           hostnames:
           - "image.io"
     connections:
-      - '{{ params.destination.connection }}'
+      - registry-polyaxon
     init:
         #s3方式加载训练代码
-      - connection: "{{ s3-con-name }}"         
+      - connection: s3-dbybucket-mlops        
         artifacts:
           #模型和推理代码
           dirs: 
@@ -71,13 +71,9 @@ component:
         - '-c'
         - '{{ context }}'
         - '-d'
-        - >-
-          {{ (connections[params.destination.connection].url + '/' + destination)
-          if (params.destination.connection in connections and
-          connections[params.destination.connection].url) else destination }}
+        - "{{ (connections[registry-polyaxon].url + '/' + destination)}}"
         - '{{ cache }}'
         - '--cache-ttl={{ cache_ttl }}'
-        - '{{ params.dockerfile.as_arg }}'
         - '--skip-tls-verify={{ skip-tls-verify }}'
         - '--insecure={{ insecure }}'
       image: gcr.io/kaniko-project/executor:latest
