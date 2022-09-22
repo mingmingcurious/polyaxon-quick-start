@@ -16,5 +16,5 @@ run:
   container:
     image: image.io/polyaxon/streamlit-app:eaa71a521e834fe0adc1b54eee222ebf
     workingDir: "/app"
-    # command: [streamlit, run, app.py]
-    # args: ["--", "--model-path=./model.joblib"]
+    command: [streamlit, run, app.py]
+    args: ["--", "--model-path=./model.joblib"]
