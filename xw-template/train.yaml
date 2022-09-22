@@ -31,16 +31,17 @@ run:
   - connection: s3-dbybucket-mlops
     #s3文件下载的根目录
     artifacts:
-      dirs: [["{{code_dir}}","{{ globals.artifacts_path }}/code"]]
+      dirs: 
+      - ["{{code_dir}}" , "{{ globals.artifacts_path }}/code"]
   container:
     #官网镜像，运行代码
-    image: {{engine_image}}
+    image: "{{engine_image}}"
     imagePullPolicy: IfNotPresent
     #自定义镜像，运行具体引擎的代码
     #指定代码目录
     workingDir: "{{ globals.artifacts_path }}/code/"
     #使用python运行默认的训练脚本
-    command: [python3, {{boot_file}}]
+    command: [python3, "{{boot_file}}"]
     args: [
       "--conv1_size={{ conv1_size }}",
       "--conv2_size={{ conv2_size }}",
