@@ -1,0 +1,19 @@
+version: 1.1
+kind: component
+name: iris-classification
+tags: ["flask-serving", "app"]
+
+run:
+  kind: service
+  #指定域名解析
+  environment:
+    hostAliases:
+    - ip: "172.16.1.33"
+      hostnames:
+      - "image.io"
+  ports: [5000]
+  rewritePath: true
+  container:
+    image: image.io/polyaxon/flask-serving:1.0.0
+    workingDir: "/app"
+    command: [python, app.py]

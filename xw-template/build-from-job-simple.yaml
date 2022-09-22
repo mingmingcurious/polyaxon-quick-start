@@ -1,0 +1,80 @@
+version: 1.1
+kind: operation
+name: build
+params:
+  destination:
+    #docker仓库连接，镜像构建完成后推送到这个仓库
+    connection: registry-polyaxon
+    value: polyaxon/flask-serving:1.0.0
+  context:
+    value: "{{ globals.artifacts_path }}"
+# runPatch:
+#   #指定域名解析
+#   environment:
+#     hostAliases:
+#     - ip: "172.16.1.33"
+#       hostnames:
+#       - "image.io"
+#   init:
+#     #s3方式加载训练代码
+#   - connection: s3-dbybucket-mlops             #使用的连接
+#     artifacts:
+#       #模型和推理代码
+#       dirs: 
+#       - ["flask-serving", "{{ globals.artifacts_path }}/app"]
+#       #构建镜像的Dockerfile
+#       files:
+#       - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
+hubRef: kaniko
+#下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
+#并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
+component:
+  version: 1.1
+  kind: component
+  name: kaniko
+  tags:
+    - build-1
+  inputs:
+    - name: context
+      type: str
+    - name: job_uuid
+      type: str
+  outputs:
+    - name: destination
+      type: image
+  run:
+    kind: job
+    environment:
+      hostAliases:
+      - ip: "172.16.1.33"
+        hostnames:
+        - "image.io"
+    init:
+      #s3方式加载训练代码
+    - connection: s3-dbybucket-mlops             #使用的连接
+      artifacts:
+        #模型和推理代码
+        dirs: 
+        - ["flask-serving", "{{ globals.artifacts_path }}/app"]
+        #构建镜像的Dockerfile
+        files:
+        - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
+    connections:
+      - '{{ params.destination.connection }}'
+    container:
+      args:
+        - '-c'
+        - '{{ context }}'
+        - '-d'
+        - " {{ (connections[params.destination.connection].url + '/' + destination) }}"
+        # - >-
+        #   {{ (connections[params.destination.connection].url + '/' + destination)
+        #   if (params.destination.connection in connections and
+        #   connections[params.destination.connection].url) else destination }}
+        - '--cache'
+        - '--cache-ttl=6h'
+        - '--skip-tls-verify=true'
+        - '--insecure=true'
+      image: gcr.io/kaniko-project/executor:latest
+      imagePullPolicy: IfNotPresent
+      name: polyaxon-main
