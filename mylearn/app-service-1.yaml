@@ -1,0 +1,18 @@
+version: 1.1
+kind: component
+name: iris-classification
+tags: ["streamlit", "app"]
+
+inputs:
+- name: uuid
+  type: str
+
+run:
+  kind: service
+  ports: [8501]
+  rewritePath: true
+  container:
+    image: image.io/polyaxon/streamlit-app:7b7a8e420863449f96a180f63cdf3c57
+    workingDir: "/app"
+    # command: [streamlit, run, app.py]
+    # args: ["--", "--model-path=./model.joblib"]
