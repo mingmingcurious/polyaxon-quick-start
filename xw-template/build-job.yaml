@@ -36,7 +36,7 @@ component:
     - build-1
   inputs:
     - {name: context,description: Dockerfile目录,type: str,isOptional: true}
-    - {name: cache,description: 缓存开关,type: bool,value: true,isOptional: true,sFlag: true}
+    - {name: cache,description: 缓存开关,type: bool,value: true,isOptional: true,isFlag: true}
     - {name: cache_ttl,type: str,value: 6h,isOptional: true}
     - {name: dockerfile,type: str,isOptional: true}
     - {name: insecure,description: http开关,type: bool,value: true,isOptional: true}
