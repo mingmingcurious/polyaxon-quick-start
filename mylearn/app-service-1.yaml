@@ -5,6 +5,12 @@ tags: ["streamlit", "app"]
 
 run:
   kind: service
+  #指定域名解析
+  environment:
+    hostAliases:
+    - ip: "172.16.1.33"
+      hostnames:
+      - "image.io"
   ports: [8501]
   rewritePath: true
   container:
