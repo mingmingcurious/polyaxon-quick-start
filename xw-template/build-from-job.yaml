@@ -4,59 +4,38 @@ name: build
 tags: [build-from-job]
 
 inputs:
-  - name: context
-    type: str
-    value: /plx-context/artifacts
-    isOptional: true
-  - name: job_uuid
-    type: str
-    value: 70a129430d3c4a91b41dbe902ec02b3d
-    isOptional: true
-  - name: image_name
-    type: str
-    value: flask-serving
-    isOptional: true
-  - name: image_tag
-    type: str
-    value: "1.0.0"
-    isOptional: true  
-  - name: plx_sys_s3_name
-    type: str
-    value: s3-dbybucket-mlops-plx 
-    isOptional: true
-  - name: plx_data_s3_name
-    type: str
-    value: s3-dbybucket-mlops
-    isOptional: true
-  - name: destination
-    type: image
-    connection: registry-polyaxon
-    value: polyaxon/flask-serving:1.0.0
-    isOptional: true
-
+  - {name: context, type: str, value: "{{ globals.artifacts_path }}", isOptional: true}
+  - {name: job_uuid, type: str, value: 70a129430d3c4a91b41dbe902ec02b3d, isOptional: true}
+  - {name: image_project, type: str, value: polyaxon, isOptional: true}
+  - {name: image_name, type: str, value: flask-serving, isOptional: true}
+  - {name: image_tag, type: str, value: "1.0.0", isOptional: true}
+  - {name: plx_sys_s3_name, type: str, value: s3-dbybucket-mlops-plx , isOptional: true}
+  - {name: plx_data_s3_name, type: str, value: s3-dbybucket-mlops, isOptional: true}
+  - {name: destination, type: image, connection: registry-polyaxon, isOptional: true}
+  - {name: image_hostname, type: str, value: "image.io", isOptional: true}
+  - {name: image_hostname_ip, type: str, value: "172.16.1.33", isOptional: true}
+  - {name: Dockerfile_path, type: str, value: "dockerfile/Dockerfile", isOptional: true}
 
 run:
   kind: job
   connections:
-    - s3-dbybucket-mlops-plx
-    - s3-dbybucket-mlops
-    - registry-polyaxon
+    - "{{ params.destination.connection }}"
   environment:
     hostAliases:
-    - ip: "172.16.1.33"
+    - ip: "{{ image_hostname_ip }}"
       hostnames:
-      - "image.io"
+      - "{{ image_hostname }}"
   init:
-  - connection: s3-dbybucket-mlops-plx 
+  - connection: "{{ plx_sys_s3_name }}" 
     artifacts:
       #训练输出的模型文件夹拷贝
       dirs: 
-      - ["70a129430d3c4a91b41dbe902ec02b3d/outputs/model", "{{ globals.artifacts_path }}/model/"]
-  - connection: s3-dbybucket-mlops 
+      - ["{{ job_uuid }}/outputs/model", "{{ globals.artifacts_path }}/model/"]
+  - connection: "{{ plx_data_s3_name }}"  
     artifacts:
       #构建镜像的Dockerfile
       files:
-      - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
+      - ["{{ Dockerfile_path }}", "{{ globals.artifacts_path }}/Dockerfile"]
   container:
     image: gcr.io/kaniko-project/executor:latest
     imagePullPolicy: IfNotPresent
@@ -64,29 +43,8 @@ run:
       "-c",
       "{{ context }}",
       "-d",
-      "image.io/polyaxon/{{ image_name }}:{{ image_tag }}",
+      "{{ (connections[params.destination.connection].url + '/'+ image_project  +'/'+ image_name + ':' + image_tag) }}",
       "--cache",
       "--skip-tls-verify=true",
       "--insecure=true"
     ]
-
-    # args: 
-    #   - '-c'
-    #   - /plx-context/artifacts
-    #   - '-d'
-    #   - image.io/polyaxon/flask-serving:1.0.0
-    #   - '--cache'
-    #   - '--cache-ttl=6h'
-    #   - '--skip-tls-verify=true'
-    #   - '--insecure=true'
-      # - '-c'
-      # - '{{ context }}'
-      # - '-d'
-      # - >-
-      #   {{ (connections[params.destination.connection].url + '/' + + image-name + ':' + image-tag)
-      #   if (params.destination.connection in connections and
-      #   connections[params.destination.connection].url) else destination }}
-      # - '--cache'
-      # - '--cache-ttl=6h'
-      # - '--skip-tls-verify=true'
-      # - '--insecure=true'
