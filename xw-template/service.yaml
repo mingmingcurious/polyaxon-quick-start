@@ -1,19 +1,30 @@
 version: 1.1
 kind: component
-name: iris-classification
-tags: ["flask-serving", "app"]
+name: service
+tags: [depoly image to service]
 
+inputs:
+  - {name: image_project, type: str, value: polyaxon, isOptional: true}
+  - {name: image_name, type: str, value: flask-serving, isOptional: true}
+  - {name: image_tag, type: str, value: "1.0.0", isOptional: true}
+  - {name: plx_sys_s3_name, type: str, value: s3-dbybucket-mlops-plx , isOptional: true}
+  - {name: plx_data_s3_name, type: str, value: s3-dbybucket-mlops, isOptional: true}
+  - {name: image_hostname, type: str, value: "image.io", isOptional: true}
+  - {name: image_hostname_ip, type: str, value: "172.16.1.33", isOptional: true}
+  - {name: ports, type: int, value: [5000], isOptional: true, isList: true}
+  - {name: workingDir, type: str, value: "/app", isOptional: true}
+  - {name: boot_file, type: str, value: app.py, isOptional: true}
 run:
   kind: service
   #指定域名解析
   environment:
     hostAliases:
-    - ip: "172.16.1.33"
+    - ip: "{{ image_hostname_ip }}"
       hostnames:
-      - "image.io"
-  ports: [5000]
+      - "{{ image_hostname }}"
+  ports: "{{ ports }}"
   rewritePath: true
   container:
-    image: image.io/polyaxon/flask-serving:1.0.0
-    workingDir: "/app"
-    command: [python, app.py]
+    image: "{{image_hostname}}/{{image_project}}/{{image_name}}:{{image_tag}}"
+    workingDir: "{{ workingDir }}"
+    command: [python, "{{ boot_file }}"]
