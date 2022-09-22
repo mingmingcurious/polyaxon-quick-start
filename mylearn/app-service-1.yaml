@@ -3,10 +3,6 @@ kind: component
 name: iris-classification
 tags: ["streamlit", "app"]
 
-inputs:
-- name: uuid
-  type: str
-
 run:
   kind: service
   ports: [8501]
