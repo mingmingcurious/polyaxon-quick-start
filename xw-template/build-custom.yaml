@@ -1,77 +1,51 @@
 version: 1.1
-kind: operation
+kind: component
 name: build
-params:
-  destination:
-    #docker仓库连接，镜像构建完成后推送到这个仓库
-    connection: registry-polyaxon
-    value: polyaxon/polyaxon-quick-start:{{ globals.uuid }}
-  context:
-    value: "{{ globals.run_artifacts_path }}/algo/polyaxon-quick-start"
-runPatch:
-  #指定域名解析
+tags: [build-from-job]
+
+inputs:
+  - {name: custom_model_path, type: str, value: flask-serving, isOptional: true}
+  - {name: dockerfile_path, type: str, value: "dockerfile/Dockerfile", isOptional: true}
+  - {name: image_project, type: str, value: polyaxon, isOptional: true}
+  - {name: image_name, type: str, value: flask-serving, isOptional: true}
+  - {name: image_tag, type: str, value: "1.0.0", isOptional: true}
+  - {name: plx_sys_s3_name, type: str, value: s3-dbybucket-mlops-plx , isOptional: true}
+  - {name: plx_data_s3_name, type: str, value: s3-dbybucket-mlops, isOptional: true}
+  - {name: image_hostname, type: str, value: "image.io", isOptional: true}
+  - {name: image_hostname_ip, type: str, value: "172.16.1.33", isOptional: true}
+  - {name: destination, type: image, connection: registry-polyaxon, isOptional: true}
+  
+
+run:
+  kind: job
+  connections:
+    - "{{ params.destination.connection }}"
   environment:
     hostAliases:
-    - ip: "172.16.1.33"
+    - ip: "{{ image_hostname_ip }}"
       hostnames:
-      - "image.io"
+      - "{{ image_hostname }}"
   init:
-    #s3方式加载训练代码
-  - path: "{{ globals.run_artifacts_path }}"  #s3文件下载的根目录
-    connection: s3-dbybucket-mlops             #使用的连接
+  - connection: "{{ plx_data_s3_name }}" 
     artifacts:
-      dirs: ["algo/polyaxon-quick-start/"]     #需要下载的目录集合  代码里面有了Dockerfile。也可以通过其他方式把Dockerfile拷贝过来到上下文context
-hubRef: my-kaniko
-#下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
-#并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
-component:
-  version: 1.1
-  kind: component
-  name: kaniko
-  tags:
-    - build-1
-  inputs:
-    - name: context
-      description: >-
-        A directory containing a Dockerfile which kaniko will use to build your
-        image, default is artifacts path.
-      type: str
-      isOptional: true
-    - name: cache
-      description: Enable cache layers created by RUN commands in a remote repository.
-      type: bool
-      value: true
-      isOptional: true
-      isFlag: true
-    - name: cache_ttl
-      type: str
-      value: 6h
-      isOptional: true
-    - name: dockerfile
-      type: str
-      isOptional: true
-  outputs:
-    - name: destination
-      type: image
-  run:
-    kind: job
-    connections:
-      - '{{ params.destination.connection }}'
-    container:
-      args:
-        - '-c'
-        - '{{ context }}'
-        - '-d'
-        - >-
-          {{ (connections[params.destination.connection].url + '/' + destination)
-          if (params.destination.connection in connections and
-          connections[params.destination.connection].url) else destination }}
-        - '{{ cache }}'
-        - '--cache-ttl={{ cache_ttl }}'
-        - '{{ params.dockerfile.as_arg }}'
-        #配置下面两个参数，让kaniko不使用https
-        - '--skip-tls-verify=true'
-        - '--insecure=true'
-      image: gcr.io/kaniko-project/executor:latest
-      imagePullPolicy: IfNotPresent
-      name: polyaxon-main
+      #训练输出的模型文件夹拷贝
+      dirs: 
+      - ["{{ custom_model_path }}", "{{ globals.artifacts_path }}/model/"]
+      files:
+      - ["{{ Dockerfile_path }}", "{{ globals.artifacts_path }}/Dockerfile"]
+  - connection: "{{ plx_data_s3_name }}"  
+    artifacts:
+      #构建镜像的Dockerfile
+     
+  container:
+    image: gcr.io/kaniko-project/executor:latest
+    imagePullPolicy: IfNotPresent
+    args: [
+      "-c",
+      "{{ globals.artifacts_path }}",
+      "-d",
+      "{{ (connections[params.destination.connection].url + '/'+ image_project  +'/'+ image_name + ':' + image_tag) }}",
+      "--cache",
+      "--skip-tls-verify=true",
+      "--insecure=true"
+    ]

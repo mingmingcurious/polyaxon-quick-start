@@ -4,17 +4,16 @@ name: build
 tags: [build-from-job]
 
 inputs:
-  - {name: context, type: str, value: "{{ globals.artifacts_path }}", isOptional: true}
   - {name: job_uuid, type: str, value: 70a129430d3c4a91b41dbe902ec02b3d, isOptional: true}
+  - {name: dockerfile_path, type: str, value: "dockerfile/Dockerfile", isOptional: true}
   - {name: image_project, type: str, value: polyaxon, isOptional: true}
   - {name: image_name, type: str, value: flask-serving, isOptional: true}
   - {name: image_tag, type: str, value: "1.0.0", isOptional: true}
   - {name: plx_sys_s3_name, type: str, value: s3-dbybucket-mlops-plx , isOptional: true}
   - {name: plx_data_s3_name, type: str, value: s3-dbybucket-mlops, isOptional: true}
-  - {name: destination, type: image, connection: registry-polyaxon, isOptional: true}
   - {name: image_hostname, type: str, value: "image.io", isOptional: true}
   - {name: image_hostname_ip, type: str, value: "172.16.1.33", isOptional: true}
-  - {name: Dockerfile_path, type: str, value: "dockerfile/Dockerfile", isOptional: true}
+  - {name: destination, type: image, connection: registry-polyaxon, isOptional: true}
 
 run:
   kind: job
@@ -35,13 +34,13 @@ run:
     artifacts:
       #构建镜像的Dockerfile
       files:
-      - ["{{ Dockerfile_path }}", "{{ globals.artifacts_path }}/Dockerfile"]
+      - ["{{ dockerfile_path }}", "{{ globals.artifacts_path }}/Dockerfile"]
   container:
     image: gcr.io/kaniko-project/executor:latest
     imagePullPolicy: IfNotPresent
     args: [
       "-c",
-      "{{ context }}",
+      "{{ globals.artifacts_path }}",
       "-d",
       "{{ (connections[params.destination.connection].url + '/'+ image_project  +'/'+ image_name + ':' + image_tag) }}",
       "--cache",
