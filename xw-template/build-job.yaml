@@ -53,7 +53,7 @@ component:
       type: str
       isOptional: true
   outputs:
-    - name: destination
+    - name: targetImage
       type: image
   run:
     kind: job
