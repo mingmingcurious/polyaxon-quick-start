@@ -1,7 +1,7 @@
 version: 1.1
 kind: component
 name: iris-classification
-tags: ["streamlit", "app"]
+tags: ["flask-serving", "app"]
 
 run:
   kind: service
@@ -11,10 +11,9 @@ run:
     - ip: "172.16.1.33"
       hostnames:
       - "image.io"
-  ports: [8501]
+  ports: [5000]
   rewritePath: true
   container:
-    image: image.io/polyaxon/streamlit-app:eaa71a521e834fe0adc1b54eee222ebf
+    image: image.io/polyaxon/flask-serving:1.0.0
     workingDir: "/app"
-    command: [streamlit, run, app.py]
-    args: ["--", "--model-path=./model.joblib"]
+    command: [python, app.py]
