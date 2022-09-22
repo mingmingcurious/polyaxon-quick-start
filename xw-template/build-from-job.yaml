@@ -49,9 +49,9 @@ run:
   init:
   - connection: s3-dbybucket-mlops-plx 
     artifacts:
-      #训练输出
+      #训练输出的模型文件夹拷贝
       dirs: 
-      - ["70a129430d3c4a91b41dbe902ec02b3d/outputs/", "{{ globals.artifacts_path }}/outputs/"]
+      - ["70a129430d3c4a91b41dbe902ec02b3d/outputs/model", "{{ globals.artifacts_path }}/model/"]
   - connection: s3-dbybucket-mlops 
     artifacts:
       #构建镜像的Dockerfile
@@ -60,15 +60,25 @@ run:
   container:
     image: gcr.io/kaniko-project/executor:latest
     imagePullPolicy: IfNotPresent
-    args: 
-      - '-c'
-      - /plx-context/artifacts
-      - '-d'
-      - image.io/polyaxon/flask-serving:1.0.0
-      - '--cache'
-      - '--cache-ttl=6h'
-      - '--skip-tls-verify=true'
-      - '--insecure=true'
+    args: [
+      "-c",
+      "{{ context }}",
+      "-d",
+      "image.io/polyaxon/{{ image-name }}:{{ image-tag }}",
+      "--cache",
+      "--skip-tls-verify=true",
+      "--insecure=true"
+    ]
+
+    # args: 
+    #   - '-c'
+    #   - /plx-context/artifacts
+    #   - '-d'
+    #   - image.io/polyaxon/flask-serving:1.0.0
+    #   - '--cache'
+    #   - '--cache-ttl=6h'
+    #   - '--skip-tls-verify=true'
+    #   - '--insecure=true'
       # - '-c'
       # - '{{ context }}'
       # - '-d'
