@@ -20,7 +20,7 @@ runPatch:
   - path: "{{ globals.run_artifacts_path }}"  #s3文件下载的根目录
     connection: s3-dbybucket-mlops             #使用的连接
     artifacts:
-      files: ["algo/polyaxon-quick-start/"]     #需要下载的目录集合
+      dirs: ["algo/polyaxon-quick-start/"]     #需要下载的目录集合
   # #构建镜像的配置
   # - dockerfile:
   #     #基础镜像 FROM
