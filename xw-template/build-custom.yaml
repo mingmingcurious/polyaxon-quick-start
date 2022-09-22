@@ -1,7 +1,7 @@
 version: 1.1
 kind: component
 name: build
-tags: [build-from-job]
+tags: [build-custom]
 
 inputs:
   - {name: custom_model_path, type: str, value: flask-serving, isOptional: true}
