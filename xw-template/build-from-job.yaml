@@ -39,7 +39,9 @@ outputs:
 run:
   kind: job
   connections:
-    - '{{ params.destination.connection }}'
+    - s3-dbybucket-mlops-plx
+    - s3-dbybucket-mlops
+    - registry-polyaxon
   init:
   - connection: s3-dbybucket-mlops-plx 
     artifacts:
@@ -59,7 +61,10 @@ run:
       - '-c'
       - '{{ context }}'
       - '-d'
-      - "{{ (connections[params.destination.connection].url + '/' + image-name + ':' + image-tag) }}"
+      - >-
+        {{ (connections[params.destination.connection].url + '/' + + image-name + ':' + image-tag)
+        if (params.destination.connection in connections and
+        connections[params.destination.connection].url) else destination }}
       - '--cache'
       - '--cache-ttl=6h'
       - '--skip-tls-verify=true'
