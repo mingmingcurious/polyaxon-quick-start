@@ -35,7 +35,7 @@ params:
 #       #构建镜像的Dockerfile
 #       files:
 #       - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
-hubRef: my-kaniko
+hubRef: kaniko
 #下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
 #并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
 component:
