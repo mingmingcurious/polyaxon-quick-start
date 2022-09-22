@@ -32,7 +32,7 @@ run:
       dirs: 
       - ["{{ custom_model_path }}", "{{ globals.artifacts_path }}/model/"]
       files:
-      - ["{{ Dockerfile_path }}", "{{ globals.artifacts_path }}/Dockerfile"]
+      - ["{{ dockerfile_path }}", "{{ globals.artifacts_path }}/Dockerfile"]
   - connection: "{{ plx_data_s3_name }}"  
     artifacts:
       #构建镜像的Dockerfile
