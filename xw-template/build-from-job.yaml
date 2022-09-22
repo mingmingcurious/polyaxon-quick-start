@@ -62,9 +62,9 @@ run:
     imagePullPolicy: IfNotPresent
     args: 
       - '-c'
-      - '{{context}}'
+      - /plx-context/artifacts
       - '-d'
-      - 'image.io/polyaxon/{{image-name}}:{{image-tag}}'
+      - image.io/polyaxon/flask-serving:1.0.0
       - '--cache'
       - '--cache-ttl=6h'
       - '--skip-tls-verify=true'
