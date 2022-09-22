@@ -18,23 +18,24 @@ params:
     value: s3-dbybucket-mlops-plx
   plx-data-s3-name:
     value: s3-dbybucket-mlops
-# runPatch:
-#   #指定域名解析
-#   environment:
-#     hostAliases:
-#     - ip: "172.16.1.33"
-#       hostnames:
-#       - "image.io"
-#   init:
-#     #s3方式加载训练代码
-#   - connection: s3-dbybucket-mlops             #使用的连接
-#     artifacts:
-#       #模型和推理代码
-#       dirs: 
-#       - ["flask-serving", "{{ globals.artifacts_path }}/app"]
-#       #构建镜像的Dockerfile
-#       files:
-#       - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
+runPatch:
+  #指定域名解析
+  environment:
+    hostAliases:
+    - ip: "172.16.1.33"
+      hostnames:
+      - "image.io"
+  init:
+  - connection: "{{ params.plx-sys-s3-name.value }}" 
+    artifacts:
+      #训练输出
+      dirs: 
+      - ["{{ params.job-uuid.value }}/outputs/", "{{ globals.artifacts_path }}/outputs/"]
+  - connection: "{{ params.plx-data-s3-name.value }}" 
+    artifacts:
+      #构建镜像的Dockerfile
+      files:
+      - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
 hubRef: kaniko
 #下面的component是指定了kaniko后polyaxon默认添加的，我拷贝过来同样可以用，
 #并且增加了 - '--skip-tls-verify=true' 和 - '--insecure=true'，解决harbor没有配置https的问题
@@ -67,22 +68,22 @@ component:
       type: image
   run:
     kind: job
-    environment:
-      hostAliases:
-      - ip: "172.16.1.33"
-        hostnames:
-        - "image.io"
-    init:
-    - connection: "{{ plx-sys-s3-name }}" 
-      artifacts:
-        #训练输出
-        dirs: 
-        - ["{{ job-uuid }}/outputs/", "{{ globals.artifacts_path }}/outputs/"]
-    - connection: "{{ plx-data-s3-name }}" 
-      artifacts:
-        #构建镜像的Dockerfile
-        files:
-        - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
+    # environment:
+    #   hostAliases:
+    #   - ip: "172.16.1.33"
+    #     hostnames:
+    #     - "image.io"
+    # init:
+    # - connection: "{{ plx-sys-s3-name }}" 
+    #   artifacts:
+    #     #训练输出
+    #     dirs: 
+    #     - ["{{ job-uuid }}/outputs/", "{{ globals.artifacts_path }}/outputs/"]
+    # - connection: "{{ plx-data-s3-name }}" 
+    #   artifacts:
+    #     #构建镜像的Dockerfile
+    #     files:
+    #     - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
     connections:
       - '{{ params.destination.connection }}'
     container:
