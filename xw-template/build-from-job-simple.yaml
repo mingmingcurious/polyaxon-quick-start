@@ -6,8 +6,8 @@ params:
     #docker仓库连接，镜像构建完成后推送到这个仓库
     connection: registry-polyaxon
     value: polyaxon/flask-serving:1.0.0
-  context:
-    value: "{{ globals.artifacts_path }}"
+  # context:
+  #   value: "{{ globals.artifacts_path }}"
   image-name:
     value: flask-serving
   image-tag:
@@ -30,7 +30,7 @@ runPatch:
     artifacts:
       #训练输出
       dirs: 
-      - ["{{ params.job-uuid }}/outputs/", "{{ globals.artifacts_path }}/outputs/"]
+      - ["70a129430d3c4a91b41dbe902ec02b3d/outputs/", "{{ globals.artifacts_path }}/outputs/"]
   - connection: s3-dbybucket-mlops 
     artifacts:
       #构建镜像的Dockerfile
@@ -42,12 +42,14 @@ hubRef: kaniko
 component:
   version: 1.1
   kind: component
-  name: my-kaniko
+  name: kaniko
   tags:
     - build-from-job
   inputs:
     - name: context
       type: str
+      value: "{{ globals.artifacts_path }}"
+      isOptional: true
     - name: job-uuid
       type: str
       isOptional: true
