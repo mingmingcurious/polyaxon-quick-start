@@ -28,7 +28,6 @@ inputs:
     type: str
     value: s3-dbybucket-mlops
     isOptional: true
-outputs:
   - name: destination
     type: image
     connection: registry-polyaxon
@@ -56,16 +55,23 @@ run:
   container:
     image: gcr.io/kaniko-project/executor:latest
     imagePullPolicy: IfNotPresent
-    name: polyaxon-main
     args: 
       - '-c'
-      - '{{ context }}'
+      - /plx-context/artifacts
       - '-d'
-      - >-
-        {{ (connections[params.destination.connection].url + '/' + + image-name + ':' + image-tag)
-        if (params.destination.connection in connections and
-        connections[params.destination.connection].url) else destination }}
+      - image.io/polyaxon/flask-serving:1.0.0
       - '--cache'
       - '--cache-ttl=6h'
       - '--skip-tls-verify=true'
       - '--insecure=true'
+      # - '-c'
+      # - '{{ context }}'
+      # - '-d'
+      # - >-
+      #   {{ (connections[params.destination.connection].url + '/' + + image-name + ':' + image-tag)
+      #   if (params.destination.connection in connections and
+      #   connections[params.destination.connection].url) else destination }}
+      # - '--cache'
+      # - '--cache-ttl=6h'
+      # - '--skip-tls-verify=true'
+      # - '--insecure=true'
