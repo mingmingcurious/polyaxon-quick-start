@@ -14,7 +14,7 @@ params:
   # insecure:
   #   value: true
   dockerfile:
-    value: "'' --skip-tls-verify=true --insecure=true"
+    value: "{{ globals.artifacts_path }}/Dockerfile --skip-tls-verify=true --insecure=true"
 runPatch:
   #指定域名解析
   environment:
