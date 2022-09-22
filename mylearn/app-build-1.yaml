@@ -24,7 +24,7 @@ runPatch:
       - ["streamlit-app", "{{ globals.artifacts_path }}/app"]
       #构建镜像的Dockerfile
       files:
-      - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}"]
+      - ["dockerfile/Dockerfile", "{{ globals.artifacts_path }}/Dockerfile"]
   # #构建镜像的配置
   # - dockerfile:
   #     #基础镜像 FROM
