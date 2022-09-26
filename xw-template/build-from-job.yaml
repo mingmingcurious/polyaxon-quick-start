@@ -21,6 +21,9 @@ run:
     - "{{ params.destination.connection }}"
   environment:
     dnsPolicy: ClusterFirstWithHostNet
+    dnsConfig:
+      nameservers:
+        - 172.16.0.1
     # hostAliases:
     # - ip: "{{ image_hostname_ip }}"
     #   hostnames:
