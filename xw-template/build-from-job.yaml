@@ -20,14 +20,14 @@ run:
   connections:
     - "{{ params.destination.connection }}"
   environment:
-    dnsPolicy: ClusterFirstWithHostNet
-    dnsConfig:
-      nameservers:
-        - 172.16.0.1
-    # hostAliases:
-    # - ip: "{{ image_hostname_ip }}"
-    #   hostnames:
-    #   - "{{ image_hostname }}"
+    # dnsPolicy: ClusterFirstWithHostNet
+    # dnsConfig:
+    #   nameservers:
+    #     - 172.16.0.1
+    hostAliases:
+    - ip: "{{ image_hostname_ip }}"
+      hostnames:
+      - "{{ image_hostname }}"
   init:
   - connection: "{{ plx_sys_s3_name }}" 
     artifacts:
