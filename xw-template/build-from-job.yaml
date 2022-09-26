@@ -19,11 +19,12 @@ run:
   kind: job
   connections:
     - "{{ params.destination.connection }}"
-  # environment:
-  #   hostAliases:
-  #   - ip: "{{ image_hostname_ip }}"
-  #     hostnames:
-  #     - "{{ image_hostname }}"
+  environment:
+    dnsPolicy: ClusterFirstWithHostNet
+    # hostAliases:
+    # - ip: "{{ image_hostname_ip }}"
+    #   hostnames:
+    #   - "{{ image_hostname }}"
   init:
   - connection: "{{ plx_sys_s3_name }}" 
     artifacts:
