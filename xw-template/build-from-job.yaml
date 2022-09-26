@@ -11,19 +11,19 @@ inputs:
   - {name: image_tag, type: str, value: "1.0.0", isOptional: true}
   - {name: plx_sys_s3_name, type: str, value: s3-dbybucket-mlops-plx , isOptional: true}
   - {name: plx_data_s3_name, type: str, value: s3-dbybucket-mlops, isOptional: true}
-  - {name: image_hostname, type: str, value: "image.io", isOptional: true}
-  - {name: image_hostname_ip, type: str, value: "172.16.1.33", isOptional: true}
+  # - {name: image_hostname, type: str, value: "image.io", isOptional: true}
+  # - {name: image_hostname_ip, type: str, value: "172.16.1.33", isOptional: true}
   - {name: destination, type: image, connection: registry-polyaxon, isOptional: true}
 
 run:
   kind: job
   connections:
     - "{{ params.destination.connection }}"
-  environment:
-    hostAliases:
-    - ip: "{{ image_hostname_ip }}"
-      hostnames:
-      - "{{ image_hostname }}"
+  # environment:
+  #   hostAliases:
+  #   - ip: "{{ image_hostname_ip }}"
+  #     hostnames:
+  #     - "{{ image_hostname }}"
   init:
   - connection: "{{ plx_sys_s3_name }}" 
     artifacts:
