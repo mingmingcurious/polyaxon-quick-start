@@ -39,7 +39,7 @@ run:
      
   container:
     #image: gcr.io/kaniko-project/executor:latest
-    image: image.io/base/kaniko-executor:debug
+    image: image.io/kaniko-project/executor:debug
     imagePullPolicy: IfNotPresent
     args: [
       "-c",

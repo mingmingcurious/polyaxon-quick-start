@@ -41,7 +41,7 @@ run:
       - ["{{ dockerfile_path }}", "{{ globals.artifacts_path }}/Dockerfile"]
   container:
     #image: gcr.io/kaniko-project/executor:latest
-    image: image.io/base/kaniko-executor:debug
+    image: image.io/kaniko-project/executor:debug
     imagePullPolicy: IfNotPresent
     args: [
       "-c",
